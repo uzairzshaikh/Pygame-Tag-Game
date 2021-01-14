@@ -1,32 +1,41 @@
 import pygame
+import sys
 pygame.font.init()
 
-WIDTH , HEIGHT = 900, 500
+WIDTH, HEIGHT = 1500, 700     #SCREEN SIZE
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
 
 
 COLOUR =[255,255,255]
-FPS = 60
-VEL = 2
-COLLISION = pygame.USEREVENT
-FONT =pygame.font.SysFont('comicsans', 40 )
+FPS = 60  #REFRESH RATE
 
-PLAYERWIDTH,PLAYERHEIGHT =100,100
-LEFTCOLOUR =[255,255,0]
-RIGHTCOLOUR =[255,0,0]
+FONT =pygame.font.SysFont('comic sans', 40)  #SCORE AND HISCORE FONT
+HIGHEST=[0]    #HIGH SCORE LIST
 
 
-def draw_window(LEFTPLAYER,RIGHTPLAYER,SCORE):
+#PLAYER ATTRIBUTES
+PLAYERWIDTH,PLAYERHEIGHT =20,20
+LEFTCOLOUR =[0,0,0]
+RIGHTCOLOUR =[5,255,255]
+VEL = 5  #SPEED OF PLAYERS
+
+
+
+def draw_window(LEFTPLAYER,RIGHTPLAYER,SCORE,HISCORE):
     WIN.fill(COLOUR)
-    LEFTIMAGE = pygame.draw.rect(WIN,LEFTCOLOUR, LEFTPLAYER)
-    RIGHTIMAGE = pygame.draw.rect(WIN,RIGHTCOLOUR, RIGHTPLAYER)
-    hiscore = FONT.render("Score:"+ str('%.2f' % SCORE),1,[5,255,255])
-    WIN.blit(hiscore,(10,10))
+    BACKGROUND(SCORE) #BACKGROUND
+    pygame.draw.rect(WIN,LEFTCOLOUR, LEFTPLAYER)   #LEFTPLAYER
+    pygame.draw.rect(WIN,RIGHTCOLOUR, RIGHTPLAYER) #RIGHTPLAYER
+    score = FONT.render("Score: "+ str('%.2f' % SCORE),1,[255,0,0]) #SCORE DISPLAY
+    WIN.blit(score,(10,10))
+    HI = FONT.render("Hiscore: "+ str('%.2f' % HISCORE),1,[255,0,0]) #SCORE DISPLAY
+    WIN.blit(HI, (200, 10))
     pygame.display.update()
 
 
-def LEFTMOVE(keys_pressed, LEFTPLAYER):
+
+def LEFTMOVE(keys_pressed, LEFTPLAYER):  #MOVEMENT OF LEFT PLAYER
     if keys_pressed[pygame.K_a] and LEFTPLAYER.x > 0:
         LEFTPLAYER.x -= VEL
     if keys_pressed[pygame.K_d] and LEFTPLAYER.x < WIDTH - PLAYERWIDTH:
@@ -38,7 +47,7 @@ def LEFTMOVE(keys_pressed, LEFTPLAYER):
 
 
 
-def RIGHTMOVE(keys_pressed, RIGHTPLAYER):
+def RIGHTMOVE(keys_pressed, RIGHTPLAYER):  #MOVEMENT OF RIGHT PLAYER
     if keys_pressed[pygame.K_LEFT]and RIGHTPLAYER.x > 0:
         RIGHTPLAYER.x -= VEL
     if keys_pressed[pygame.K_RIGHT] and RIGHTPLAYER.x < WIDTH - PLAYERWIDTH:
@@ -49,22 +58,50 @@ def RIGHTMOVE(keys_pressed, RIGHTPLAYER):
         RIGHTPLAYER.y += VEL
 
 
+
+def BACKGROUND(SCORE):
+
+    if (SCORE//2)%2==0:
+        for x in range(int(HEIGHT / PLAYERHEIGHT)):  # LOOP TO CREATE BACKGROUND HORIZONTAL
+            if x % 2 == 0:
+                pygame.draw.rect(WIN, LEFTCOLOUR, [0,x * PLAYERHEIGHT, WIDTH, PLAYERHEIGHT])
+            else:
+                pygame.draw.rect(WIN, RIGHTCOLOUR, [0,x * PLAYERHEIGHT, WIDTH, PLAYERHEIGHT])
+
+    else:
+        for x in range(int(WIDTH/PLAYERWIDTH)): #LOOP TO CREATE BACKGROUND VERTICAL
+            if x%2 == 0:
+                pygame.draw.rect(WIN, LEFTCOLOUR, [x*PLAYERWIDTH,0,PLAYERWIDTH,HEIGHT])
+            else:
+                pygame.draw.rect(WIN, RIGHTCOLOUR, [x*PLAYERWIDTH,0,PLAYERWIDTH,HEIGHT])
+
+def timer(X):
+    for i,x in enumerate(X):
+        HI = FONT.render(str(x), 1, [255, 0, 0])  # SCORE DISPLAY
+        WIN.blit(HI, ((WIDTH/2)-HI.get_width()/2, (HEIGHT/2)+HI.get_height()*i))
+        pygame.display.update()
+        pygame.time.delay(1500)
+
+
 def main():
     clock = pygame.time.Clock()
-    time = 0
-    run = True
+    TIME = 0
 
+
+    #INITIAL PLAYER POSITIONS
     LEFTX,  LEFTY= 100, (HEIGHT/2)-(PLAYERHEIGHT/2)
     RIGHTX, RIGHTY = WIDTH - 100 - PLAYERWIDTH, (HEIGHT/2)-(PLAYERHEIGHT/2)
 
+    #CREATING PLAYER OBJECTS
     LEFTPLAYER =pygame.Rect( LEFTX,  LEFTY, PLAYERWIDTH, PLAYERHEIGHT)
     RIGHTPLAYER = pygame.Rect(RIGHTX, RIGHTY, PLAYERWIDTH, PLAYERHEIGHT)
 
-    while run:
+    while True:
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
+                sys.exit()
         keys_pressed = pygame.key.get_pressed()
 
 
@@ -72,14 +109,21 @@ def main():
         RIGHTMOVE(keys_pressed,RIGHTPLAYER)
 
         if LEFTPLAYER.colliderect(RIGHTPLAYER):
-            draw_window(LEFTPLAYER,RIGHTPLAYER, time)
+            pygame.time.delay(1000)
+            timer(["READY!","SET!","GO!"])
+            HIGHEST.append(TIME)
+            HISCORE = max(HIGHEST)
+            break
+
         else:
-            time += 1 / FPS
+            TIME += 1 / FPS
+            HISCORE = max(HIGHEST)
+        draw_window(LEFTPLAYER,RIGHTPLAYER, TIME, HISCORE)
 
-        draw_window(LEFTPLAYER,RIGHTPLAYER, time)
+    main()
 
 
-    pygame.quit()
+
 
 
 if __name__ == "__main__":
