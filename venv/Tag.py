@@ -75,12 +75,12 @@ def BACKGROUND(SCORE):
             else:
                 pygame.draw.rect(WIN, RIGHTCOLOUR, [x*PLAYERWIDTH,0,PLAYERWIDTH,HEIGHT])
 
-def timer(X):
+def COUNTDOWN(X):
     for i,x in enumerate(X):
         HI = FONT.render(str(x), 1, [255, 0, 0])  # SCORE DISPLAY
         WIN.blit(HI, ((WIDTH/2)-HI.get_width()/2, (HEIGHT/2)+HI.get_height()*i))
         pygame.display.update()
-        pygame.time.delay(1500)
+        pygame.time.delay(1000)
 
 
 def main():
@@ -110,7 +110,7 @@ def main():
 
         if LEFTPLAYER.colliderect(RIGHTPLAYER):
             pygame.time.delay(1000)
-            timer(["READY!","SET!","GO!"])
+            COUNTDOWN(["YOU WERE CAUGHT!","READY!","SET!","GO!"])
             HIGHEST.append(TIME)
             HISCORE = max(HIGHEST)
             break
