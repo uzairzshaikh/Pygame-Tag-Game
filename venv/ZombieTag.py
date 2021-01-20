@@ -60,17 +60,21 @@ class Island:
         self.size  = size
         self.colour = colour
     
-    
-def draw_window(Player):
-    window.fill(colour)
+def draw_player(Player):
     pygame.draw.rect(window, Player.colour,( Player.x,Player.y,Player.size,Player.size))
+
+def draw_window(Player,Zombie):
+    window.fill(colour)
+    draw_player(Zombie)
+    draw_player(Player)
+
     pygame.display.update()
 
 
 def main():
     clock = pygame.time.Clock()
     Play = Player(0,0,20,1,(255,7,6))
-    Zombie(200, 100, 20, 1, (0, 7, 6))
+    Zomb = Zombie(200, 100, 20, 1, (200, 7, 200))
     while True:
         clock.tick(fps)
         for event in pygame.event.get():
@@ -80,6 +84,7 @@ def main():
         keys_pressed = pygame.key.get_pressed()
 
         Play.move(keys_pressed)
-        draw_window(Play)
+        Zomb.chase(Play)
+        draw_window(Play,Zomb)
 
 main()
