@@ -21,6 +21,8 @@ class Player:
         self.right_wall =[self.x+x for x in range(size)]
         self.top_wall = [self.x+x for x in range(size)]
         self.bottom_wall = [self.x+x for x in range(size)]
+
+
     def move(self,keys_pressed):
         if keys_pressed[pygame.K_LEFT] and self.x > 0:
             self.x -= self.speed
@@ -30,6 +32,7 @@ class Player:
             self.y -= self.speed
         if keys_pressed[pygame.K_DOWN] and self.y < height - self.size:
             self.y += self.speed
+        self.rect = pygame.Rect( self.x, self.y , self.size, self.size) #if defined earlier, will only call initial values
 
 
 class Zombie:
@@ -43,7 +46,7 @@ class Zombie:
         self.right_wall =[self.x+x for x in range(size)]
         self.top_wall = [self.x+x for x in range(size)]
         self.bottom_wall = [self.x+x for x in range(size)]
-    
+
     def chase(self,Player):
         if Player.x < self.x and self.x > 0:
             self.x -= self.speed
@@ -53,6 +56,7 @@ class Zombie:
             self.y -= self.speed
         if Player.y > self.y and self.y < height - self.size:
             self.y += self.speed
+        self.rect = pygame.Rect( self.x, self.y , self.size, self.size)
 
 
 class Island:
@@ -61,12 +65,12 @@ class Island:
         self.colour = colour
     
 def draw_player(Player):
-    pygame.draw.rect(window, Player.colour,( Player.x,Player.y,Player.size,Player.size))
+    pygame.draw.rect(window, Player.colour,(Player.rect))
 
-def draw_window(Player,Zombie):
+def draw_window(Playe,Zombi):
     window.fill(colour)
-    draw_player(Zombie)
-    draw_player(Player)
+    draw_player(Zombi)
+    draw_player(Playe)
 
     pygame.display.update()
 
@@ -83,8 +87,12 @@ def main():
                 sys.exit()
         keys_pressed = pygame.key.get_pressed()
 
+
         Play.move(keys_pressed)
         Zomb.chase(Play)
-        draw_window(Play,Zomb)
+
+        draw_window(Play, Zomb)
+
+
 
 main()
